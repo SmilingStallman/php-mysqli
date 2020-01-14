@@ -1,0 +1,124 @@
+html{
+  background-color: black;
+}
+
+body{
+  margin-bottom: 200px;
+  color: white;
+}
+
+p{
+  font-size: 30px;
+}
+h4{
+  font-size: 2rem;
+}
+
+.table-container{
+  width: 2000px;
+  width: 90vw;
+  overflow-x: scroll;
+  padding: 20px;
+  font-size: 2rem;
+}
+
+/* TABLE */
+.practice_table{
+  border-collapse: collapse;
+  color: #999999;
+  transition: all .5s;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  word-break: break-all;
+}
+.practice_table thead{
+    text-align: center;
+}
+.practice_table thead, tfoot{
+    background-color: #999999;
+    text-align: left;
+    color: black;
+}
+.practice_table caption{
+    caption-side: bottom;
+    text-align: right;
+    font-style: italic;
+}
+.practice_table tbody tr.odd{
+    background-color: #3a354a !important;
+}
+.practice_table tbody tr.even{
+    background-color: #221c33 !important;
+}
+/* #practice_table thead th:nth-child(1), #practice_table thead th:nth-child(2), #practice_table thead th:nth-child(3){
+    width: 10%;
+} */
+.practice_table td:not(:first-of-type){
+    padding: 20px;
+    text-transform: capitalize;
+}
+.practice_table thead td{
+    text-transform: capitalize;
+}
+.practice_table tfoot{
+    text-align: right;
+}
+
+/* SHOW ENTRIES */
+.dataTables_length, .dataTables_info{
+  display: inline;
+}
+.dataTables_length select{
+  margin: 0 0 3px 5px;
+  width: 65px;
+  /* float: right; */
+  border-radius: 2px;
+  background: #3a354a;
+  color: #999999;
+}
+.dataTables_filter{
+  float: right;
+  margin-bottom: 3px;
+  border-radius: 2px;
+}
+.dataTables_paginate{
+  margin-top: 20px;
+}
+.dataTables_filter input{
+  background: #3a354a;
+  color: #999999;
+  border: 0;
+  margin-bottom: 10px;
+  padding: 5px;
+}
+.paginate_button{
+  outline: 0;
+}
+.paginate_button.current{
+  border: 1px solid #cdd422;
+  box-sizing: border-box;
+  display: inline-block;
+  min-width: 1.5em;
+  text-align: center;
+  text-decoration: none !important;
+  cursor: pointer;
+  margin: 0 5px;
+  border-radius: 2px;
+}
+
+
+/*forms*/
+.flex-form{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 800px;
+}
+
+/* .flex-form label{
+  display: flex;
+  justify-content: space-between;
+} */
+
+.submit, label{
+  margin-top: 10px;
+}
