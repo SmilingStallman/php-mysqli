@@ -17,6 +17,7 @@
     echo 'No customer exists with specified ID.';
   }
 
-  echo json_encode($customer);
+  echo mysqli_error($conn);
 
+  echo json_encode($customer);
 ?>

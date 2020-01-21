@@ -3,6 +3,28 @@
   require_once 'dbConn.class.php';
   require_once 'facade/ordersFacade.class.php';
   require_once 'tableBuilder.php';
+  require_once 'check_pass.php';
+
+  function request_login(){
+    header('WWW-Authenticate: Basic realm="Restricted Area. If not registered, click "Cancel" to register.');
+    header('HTTP/1.0 401 Unauthorized');
+  }
+
+  if(isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])){
+    if(!check_pass($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])){
+      request_login();
+      die("Bad login info. Please reload page and try again.");
+    }
+  }
+  else{
+    request_login();
+    die('Cannot access this page without loging in. Please reload page and log in.');
+  }
+
+  //set user cookie...domain set false for localhostx
+  if(!isset($_COOKIE['userInfo'])){
+    setcookie('userInfo', json_encode(['userID' => 'demo', 'lastLogin' => date("m-d-Y H:i:s"), 'visits' => 1]), time() + 60 * 60 * 24 * 365, '/', false);
+  }
 
   $conn = dbConn::getInstance();
   $orders_facade = new ordersFacade($conn);
@@ -40,6 +62,16 @@
   }
 ?>
 
+<?php if(isset($_COOKIE['userInfo'])){
+    $user_cookie = json_decode($_COOKIE['userInfo'], true);
+    $user_cookie['visits']++;
+    setcookie('userInfo', json_encode($user_cookie), time() + 60 * 60 * 24 * 365, '/', false);
+?>
+    <section>
+      <h2>Hello IP <?= $_SERVER['REMOTE_ADDR'] ?>, user <?= $_SERVER['PHP_AUTH_USER']?>. Your first login was <?= $user_cookie['lastLogin']?>. You have visited <?= $user_cookie['visits'] ?> times.</h2>
+    </section>
+<?php } ?>
+
 <!DOCTYPE html>
 <html lang="en-US" class="index">
 <head>
@@ -51,11 +83,10 @@
     <link rel="stylesheet" href="index.css">
     <title>Learn Some MySQLi</title>
 </head>
-
 <body>
+
   <section>
-    <h2>DB connection status: <?= $test_conn ?></h2>
-    <h2>Basic PHP Back-End with MYSQLi</h2>
+    <h2>DB connection status: <?= $test_conn ?>.</h2>
     <div class="table-container">
       <h4>Customers</h4>
       <table class="practice_table" id="practice_tableA" class="display" style="width: 100%">
@@ -144,19 +175,21 @@
   </section>
 
   <section>
-    <h2>Single Responsibility Principle</h2>
-    <p>Problem: Owner wants to calculate number of all orders shipped &#40;actor 1&#41;. Shipping wants to have an alert message if greater than 30% orders not shipped &#40;actor 2&#41;. Order support wants list of all orders from current day &#40;actor 3&#41;.</p>
-    <p>Bad design: Put all responsibilities in same <i>orderDetails</i> class.</p>
-    <p>Better Design: break each actor into a seperate module and create an single point off access through a single interface class &#40;facade pattern&#41;</p>
-    <p><?php echo $orders_facade->getNumShipped(); ?></p>
+    <h2 style='color: pink'>Single Responsibility Principle</h2>
+    <div style='font-size: 1.5rem; background: green'>
+      <p>Problem: Owner wants to calculate number of all orders shipped &#40;actor 1&#41;. Shipping wants to have an alert message if greater than 30% orders not shipped &#40;actor 2&#41;. Order support wants list of all orders from current day &#40;actor 3&#41;.</p>
+      <p>Bad design: Put all responsibilities in same <i>orderDetails</i> class.</p>
+      <p>Better Design: break each actor into a seperate module and create an single point off access through a single interface class &#40;facade pattern&#41;.</p>
+    </div>
+    <p>Output:<br><br><?php echo $orders_facade->getNumShipped(); ?></p>
     <p><?php echo $orders_facade->checkUnshippedWarning();?></p>
     <p><?php echo $orders_facade->getShippedToday();?></p>
   </section>
 
   <section>
-    <h2>String Sanitizing</h2>
-    <pre><code class='php'>
-      //Use proper semantic hmtl to limit and sanitize as much as possible &#40;ex. <input type='number'> instead of <input type='text'>
+    <h2 style='color: pink'>String Sanitizing</h2>
+    <pre><code class='php' style='font-size: 1.5rem; background: green'>
+      //Use proper semantic hmtl to limit and sanitize as much as possible &#40;ex. &lt;input type='number'&gt; instead of &lt;input type='text'&gt;
       //Still need to do proper sanitizing via PHP before submitting, through. Sanitzation
 
       function sanitizeString($string){
@@ -213,7 +246,6 @@ $('#cust_pop').submit(function(event){
 </html>
 
 <?php
-  $conn->close;
-  $customers->close;
-  $order->close;
+  $conn->close();
+  $customers->close();
 ?>
