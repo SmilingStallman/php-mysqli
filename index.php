@@ -1,25 +1,14 @@
 <?php
   error_reporting(E_ALL);
-  require_once 'dbConn.class.php';
-  require_once 'facade/ordersFacade.class.php';
-  require_once 'tableBuilder.php';
-  require_once 'check_pass.php';
+  require_once('check_pass.php');
+  require_once('auth.php');
 
-  function request_login(){
-    header('WWW-Authenticate: Basic realm="Restricted Area. If not registered, click "Cancel" to register.');
-    header('HTTP/1.0 401 Unauthorized');
-  }
+  auth();
 
-  if(isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])){
-    if(!check_pass($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])){
-      request_login();
-      die("Bad login info. Please reload page and try again.");
-    }
-  }
-  else{
-    request_login();
-    die('Cannot access this page without loging in. Please reload page and log in.');
-  }
+  require_once('dbConn.class.php');
+  require_once('facade/ordersFacade.class.php');
+  require_once('tableBuilder.php');
+
 
   //set user cookie...domain set false for localhostx
   if(!isset($_COOKIE['userInfo'])){

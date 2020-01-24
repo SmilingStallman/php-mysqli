@@ -44,21 +44,37 @@
 
     fetch('createuser.php',
           {
-           method: 'post',
-           body: formData
+           method: 'POST',
+           body: formData,
+           credentials: 'same-origin'
           }
         ).then(response => response.text())
         .then(result =>
         {
             if(result === "success"){
-              window.location = "index.php";
+              window.location = "../index.php";
+
+              let date = new Date();
+              date = date.setTime(date.getTime() + 12 * 60 * 60 * 1000);
+
+              let user = $('input[name="username"]').val();
+              let pass = $('input[name="pass"]').val();
+
+              let cookieJson = JSON.stringify({
+                'user': `${user}`,
+                'pass': `${pass}`
+              });
+
+              document.cookie = `login=${cookieJson}; expires=${date}; path=/;`;
             }
             else{
+              // console.log(result.headers.get('set-cookie'));
+              // console.log(document.cookie);
               $("#error").show();
             }
         });
   });
 
-  $("#continue").click(() => window.location = 'index.php');
+  $("#continue").click(() => window.location = '../index.php');
 
 </script>
