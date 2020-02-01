@@ -5,10 +5,28 @@
 
   auth();
 
+  ini_set('session.gc_maxlifetime', 60 * 60 * 24);
+
+  session_start();
+
+  if(!isset($_SESSION['start_time'])){
+    $_SESSION['start_time'] = time();
+    $_SESSION['ip'] = $_SERVER['REMOTE_ADDR'];
+    $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+  }
+
+  if($_SESSION['ip'] != $_SERVER['REMOTE_ADDR'] || $_SESSION['user_agent'] != $_SERVER['HTTP_USER_AGENT']){
+    die("Access data does not match session data. Page load cancelled");
+    session_destroy();
+  }
+
+  $cur_mins = round((time() - $_SESSION['start_time']) / 60);
+  $cur_hours = floor($cur_mins / 60);
+  $cur_mins = $cur_mins % 60;
+
   require_once('dbConn.class.php');
   require_once('facade/ordersFacade.class.php');
   require_once('tableBuilder.php');
-
 
   //set user cookie...domain set false for localhostx
   if(!isset($_COOKIE['userInfo'])){
@@ -55,11 +73,8 @@
     $user_cookie = json_decode($_COOKIE['userInfo'], true);
     $user_cookie['visits']++;
     setcookie('userInfo', json_encode($user_cookie), time() + 60 * 60 * 24 * 365, '/', false);
+}
 ?>
-    <section>
-      <h2>Hello IP <?= $_SERVER['REMOTE_ADDR'] ?>, user <?= $_SERVER['PHP_AUTH_USER']?>. Your first login was <?= $user_cookie['lastLogin']?>. You have visited <?= $user_cookie['visits'] ?> times.</h2>
-    </section>
-<?php } ?>
 
 <!DOCTYPE html>
 <html lang="en-US" class="index">
@@ -73,6 +88,16 @@
     <title>Learn Some MySQLi</title>
 </head>
 <body>
+
+  <?php if(isset($_COOKIE['userInfo'])){ ?>
+    <section>
+      <h2>Hello IP <?= $_SERVER['REMOTE_ADDR'] ?>, user <?= $_SERVER['PHP_AUTH_USER']?>. Your first login was <?= $user_cookie['lastLogin']?>. You have visited <?= $user_cookie['visits'] ?> times.</h2>
+      <h2>Your current session has lasted for <?= $cur_hours ?> hours, <?= $cur_mins ?> mins.</h2>
+      <h2>User Agent info allows webservers to see more data on you. Here is some data on your OS and browser:
+        <br><br> <?= $_SESSION['user_agent'] ?><br><br> To prevent this, use a user agent switcher extension.</h2>
+      <br><br>
+    </section>
+<?php } ?>
 
   <section>
     <h2>DB connection status: <?= $test_conn ?>.</h2>
@@ -229,6 +254,7 @@ $('#cust_pop').submit(function(event){
       alert('Cannot find customer info');
     }
   });
+
 });
 </script>
 
